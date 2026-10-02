@@ -1,0 +1,2 @@
+# Invented blocklist for the selftests. Real lists live outside any repo (KB_BLOCKLIST).
+quillfeather assessments

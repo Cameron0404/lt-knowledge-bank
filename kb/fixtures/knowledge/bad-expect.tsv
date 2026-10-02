@@ -1,0 +1,28 @@
+kb-system-bad-dup-subject-a.md	subject fixture-dup is also used
+kb-system-bad-dup-subject-b.md	subject fixture-dup is also used
+kb-system-bad-excluded-bank-build.md	excluded source: the knowledge-bank build
+kb-system-bad-excluded-call.md	excluded by KB_EXCLUDE
+kb-system-bad-excluded-club-inbox.md	excluded source: call transcript
+kb-system-bad-excluded-fenced-brief.md	BANK DATA fence
+kb-system-bad-excluded-group-info.md	excluded source: the group roster
+kb-system-bad-excluded-lecture.md	excluded source: raw lecture transcript
+kb-system-bad-excluded-study.md	excluded source: group chat
+kb-system-bad-fence-title.md	fence marker
+kb-system-bad-fragment-far.md	not a whole source line
+kb-system-bad-fragment-partial.md	not a whole source line
+kb-system-bad-id-class.md	id says class system but the sources make it dictation
+kb-system-bad-id-mismatch.md	differs from the file name
+kb-system-bad-imperative-title.md	imperative
+kb-system-bad-long-title.md	at most 12
+kb-system-bad-missing-subject.md	lacks subject
+kb-system-bad-name-in-claim.md	names a listed person
+kb-system-bad-name-in-title.md	title names a listed person
+kb-system-bad-no-claims.md	no claims
+kb-system-bad-paragraph-hash.md	paragraph hash
+kb-system-bad-pointer-only-quoted.md	may only be a pointer claim
+kb-system-bad-repo-title.md	**Repo: line
+kb-system-bad-role-under-three.md	role label for fewer than three people
+kb-system-bad-speech-to-role.md	speech attributed to a role
+kb-system-bad-uncited-bullet.md	bullet is not a claim
+kb-system-bad-unlisted-source.md	not on the source allow-list
+kb-system-idris-fennimore-notes.md	file name names a listed person

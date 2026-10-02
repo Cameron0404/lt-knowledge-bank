@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.DS_Store
+# The bundled queue's entries, written by kb/queue_add.py
+scheduled-work/
+# Local settings and lists: these belong in ~/.config/knowledge-bank/, never in the repo
+.env
+blocklist.txt
+!kb/fixtures/knowledge/blocklist.txt
+people.txt
+*.db
+*.db-journal
+*.db-wal
