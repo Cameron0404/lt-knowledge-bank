@@ -2,7 +2,7 @@
 
 A knowledge bank for AI agents, where every claim on a page quotes the whole source line it came from. Each quote names the file, the line, the commit (or a paragraph hash for an untracked file) and the date. Agents get pointers to the pages, never distilled sentences, and a daily scan stops serving any claim whose source line has gone.
 
-It is one system from the Life Tracker, my personal agent system, published on its own. Written up at [thecameronmills.com/projects/knowledge-bank](https://thecameronmills.com/projects/knowledge-bank). The session handover that the site page describes alongside it (`/initiate`, `/checkpoint` and the session ledger) lives in [life-tracker-kit](https://github.com/Cameron0404/life-tracker-kit).
+It is one system from the Life Tracker, my personal agent system, published on its own. Written up at [thecameronmills.com/projects/knowledge-bank](https://thecameronmills.com/projects/knowledge-bank). The session handover that the site page describes alongside it (`/initiate`, `/checkpoint` and the session ledger) lives in [life-tracker-kit](https://github.com/cmills-dev/life-tracker-kit).
 
 ## Why
 
@@ -47,7 +47,7 @@ The obvious design hands agents distilled sentences with citations attached. Tha
 1. Clone the repo.
 
    ```bash
-   git clone https://github.com/Cameron0404/lt-knowledge-bank.git
+   git clone https://github.com/cmills-dev/lt-knowledge-bank.git
    cd lt-knowledge-bank
    ```
 
