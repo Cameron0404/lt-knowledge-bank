@@ -250,8 +250,8 @@ def case_names_in_title_refused():
     ok(kb.names_in("Notes after the call with Oriane", terms), "a first name was missed")
     ok(kb.names_in("LINDQVIST agreed", terms), "an upper-case surname was missed")
     ok(not kb.names_in("Notes from the meeting", terms), "a plain title was flagged")
-    # The owner is never a listed person, and a names file outside the temp dir is ignored.
-    ok(kb._name_tokens("Ada Example") == [], "the owner's name became a name term")
+    # The user is never a listed person, and a names file outside the temp dir is ignored.
+    ok(kb._name_tokens("Ada Example") == [], "the user's name became a name term")
     old = with_env(KB_NAMES_FILE=str(kb.HOME / "names.txt"))
     try:
         ok(quiet(kb._env_temp_path, "KB_NAMES_FILE") is None, "KB_NAMES_FILE outside the temp dir was honoured")
@@ -480,7 +480,12 @@ def case_kb_root_confined():
     ok(rc == 2 and not (kb.HOME / "kb-elsewhere").exists(), f"install --to outside: rc={rc}")
     old = with_env(KB_INDEX=str(kb.HOME / "kb-index.db"))
     try:
-        ok(quiet(kb.index_path) == kb.STATE / "kb-index.db", "KB_INDEX outside the temp dir was honoured")
+        try:
+            quiet(kb.index_path)
+        except kb.KBError:
+            pass
+        else:
+            ok(False, "invalid KB_INDEX must fail instead of selecting the live index")
     finally:
         restore_env(old)
 
@@ -746,7 +751,13 @@ def case_index_path_outside_repo_and_vault():
     ok(kb.index_location_problem(kb.STATE / "kb-index.db") is None, "the state folder was refused")
     old = with_env(KB_INDEX=str(kb.REPO / "kb.db"))
     try:
-        ok(quiet(kb.index_path) == kb.STATE / "kb-index.db", "KB_INDEX inside the repo was honoured")
+        for action in (kb.index_path, kb.queue_add_path):
+            try:
+                quiet(action)
+            except kb.KBError:
+                pass
+            else:
+                ok(False, "repository KB_INDEX must fail before selecting a live index or queue")
     finally:
         restore_env(old)
     if not kb.MAIN_CHECKOUT.is_dir():
@@ -868,7 +879,7 @@ def case_query_build_stage_uses_pipeline():
     (base / "fixture-alpha").mkdir()
     (base / "fixture-alpha" / "pipeline.json").write_text(json.dumps(
         {"request": "Build the zebra ledger for fixture runs", "deliverable": "a quokka report"}), encoding="utf-8")
-    body = ("\n**Repo: /nowhere**\n\n**Who queued this.** The owner's build skill, platypus provenance.\n\n"
+    body = ("\n**Repo: /nowhere**\n\n**Who queued this.** The user's build skill, platypus provenance.\n\n"
             "# Build `fixture-alpha`, stage `build-2`: Build stage 2\n\n"
             "## This stage: build stage 2 of the ledger\n\nwombat numbat bilby\n")
     old = with_env(KB_BUILDS_DIR=str(base))
@@ -1377,6 +1388,15 @@ def case_purge_removes_claims_history_index():
     lines = []
     old = with_env(LT_RUN_ID=None)
     try:
+        snapshot = {str(p.relative_to(base)): p.read_bytes() for p in base.rglob("*") if p.is_file()}
+        invalid_env = with_env(KB_INDEX=str(kb.REPO / "kb.db"))
+        try:
+            refused = kb.purge(target, root, emit=lambda *_: None)
+        finally:
+            restore_env(invalid_env)
+        ok(refused == 2, "invalid repository index must refuse purge")
+        ok(snapshot == {str(p.relative_to(base)): p.read_bytes() for p in base.rglob("*") if p.is_file()},
+           "invalid index changed pages, history, manifest or database before refusing")
         rc = kb.purge(target, root, idx, emit=lines.append)
     finally:
         restore_env(old)

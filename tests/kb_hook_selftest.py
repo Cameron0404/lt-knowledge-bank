@@ -138,7 +138,7 @@ PRIVATE_PIPE = {  # the source repo, no deploy, deliverable inside
     "request": "Make the fixture runner handle a held lock: wait one minute, retry, keep old records",
     "deliverable": "An improved runner merged into the source repo main with tests and docs/runner.md rewritten",
 }
-BRIEF = (f"**Repo: {LT}**\n\n**Who queued this.** The owner's `/build` skill queued this brief.\n\n"
+BRIEF = (f"**Repo: {LT}**\n\n**Who queued this.** The user's `/build` skill queued this brief.\n\n"
          "# Build `{slug}`, stage `build-1`: Build stage 1\n\n"
          "## This stage: build stage 1, the held lock\n\nRead the plan and build it. Zebracrossing marker.\n")
 

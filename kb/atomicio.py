@@ -31,13 +31,17 @@ import os
 import tempfile
 
 
-def write_bytes(path, data: bytes) -> None:
+def write_bytes(path, data: bytes, *, mode=None) -> None:
+    """Use an explicit mode for private stores, otherwise preserve the destination mode."""
     path = os.fspath(path)
     d = os.path.dirname(path) or "."
-    try:
-        mode = os.stat(path).st_mode & 0o777
-    except FileNotFoundError:
-        mode = 0o644
+    if mode is None:
+        try:
+            mode = os.stat(path).st_mode & 0o777
+        except FileNotFoundError:
+            mode = 0o644
+    if not isinstance(mode, int) or not 0 <= mode <= 0o777:
+        raise ValueError("mode must be permission bits between 0 and 0o777")
     fd, tmp = tempfile.mkstemp(prefix="." + os.path.basename(path) + ".", suffix=".tmp", dir=d)
     try:
         with os.fdopen(fd, "wb") as f:
@@ -64,5 +68,5 @@ def write_bytes(path, data: bytes) -> None:
         os.close(dfd)
 
 
-def write_text(path, text: str, encoding: str = "utf-8") -> None:
-    write_bytes(path, text.encode(encoding))
+def write_text(path, text: str, encoding: str = "utf-8", *, mode=None) -> None:
+    write_bytes(path, text.encode(encoding), mode=mode)

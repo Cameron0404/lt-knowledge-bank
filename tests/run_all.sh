@@ -4,7 +4,7 @@ set -u
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 PY="${KB_PYTHON:-python3}"
 fail=0
-for t in atomicio_selftest knowledge_selftest kb_hook_selftest; do
+for t in atomic_permissions_selftest atomicio_selftest knowledge_selftest kb_hook_selftest; do
   echo "== $t"
   if "$PY" "tests/$t.py" > "${TMPDIR:-/tmp}/kb-$t.out" 2>&1; then
     tail -1 "${TMPDIR:-/tmp}/kb-$t.out"

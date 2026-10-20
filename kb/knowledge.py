@@ -145,7 +145,12 @@ def _env_temp_path(var: str) -> Path | None:
 
 
 def index_path() -> Path:
-    return _env_temp_path("KB_INDEX") or STATE / "kb-index.db"
+    if not os.environ.get("KB_INDEX"):
+        return STATE / "kb-index.db"
+    candidate = _env_temp_path("KB_INDEX")
+    if candidate is not None and index_location_problem(candidate) is None:
+        return candidate
+    raise KBError("KB_INDEX must be under the temp directory and outside every repository and vault")
 
 
 def runs_dir() -> Path:
@@ -346,7 +351,7 @@ def _norm_path(p: str) -> str:
 
 def volatility(path: str) -> str:
     """decision | state | procedure | reference | unknown, from the logical path alone.
-    Dictation files count as reference: they are the owner's own dated notes, and their lines
+    Dictation files count as reference: they are the user's own dated notes, and their lines
     may be quoted through `ask`, which pointer-only would forbid."""
     p = _norm_path(path)
     if (p.startswith("_meta/goals/") or p == "_meta/decisions.md"
@@ -509,7 +514,7 @@ def leaks(text: str) -> bool:
     return any(find_term(low, sq, t) is not None for t in terms)
 
 
-# The owner's own name parts, which are never treated as another person (KB_OWNER_NAMES,
+# The user's own name parts, which are never treated as another person (KB_OWNER_NAMES,
 # space separated, for example "ada lovelace").
 OWNER = set(os.environ.get("KB_OWNER_NAMES", "").lower().split())
 # Common English words that happen to be names too, never treated as a name term.
@@ -1723,7 +1728,7 @@ def _fm_of(sources: Sources, logical: str) -> dict:
 
 
 def read_dictations(sources: Sources | None = None, skipped: dict | None = None) -> list:
-    """The owner's dictations the bank may point at: the intake candidates in `_inbox/` and
+    """The user's dictations the bank may point at: the intake candidates in `_inbox/` and
     the raw dictation notes in `~/vault/raw/inbox/dictations/`. A raw note that names its
     candidate (`candidate:`) is the same dictation, so the candidate stands for both and a raw
     note with no `ask:` of its own takes its candidate's. Skipped: `triaged-noise`,
@@ -1930,8 +1935,8 @@ def pointer_specs(sources: Sources, name_terms) -> list:
             by_ask.setdefault(d["ask"], []).append(c)
     for ask in ASK_KINDS:
         if by_ask.get(ask):
-            specs.append(_spec(f"dictation-ask-{ask}", f"Dictations the owner filed as {ask}", f"dictation-ask-{ask}",
-                               f"The owner's own {ask} dictations, newest last, pointed at by path and date.",
+            specs.append(_spec(f"dictation-ask-{ask}", f"Dictations the user filed as {ask}", f"dictation-ask-{ask}",
+                               f"The user's own {ask} dictations, newest last, pointed at by path and date.",
                                sorted(by_ask[ask], key=lambda c: (c["date"], c["path"]))))
 
     # Interview prep: career class.
@@ -2157,7 +2162,7 @@ def STATE_DIR() -> Path:  # noqa: N802 - reads like the constant it stands in fo
     return index_path().parent
 
 
-# Purge: take a source out of the bank everywhere it is quoted or pointed at. By hand, for the owner:
+# Purge: take a source out of the bank everywhere it is quoted or pointed at. By hand, for the user:
 # never under a managed run. Nothing is deleted as a file (a design rule: code here never deletes): pages
 # and _history copies are rewritten without the claims, and the index rows are removed.
 
@@ -2189,13 +2194,17 @@ def _fts_body(page: dict) -> str:
 def purge(source: str, root=None, index=None, emit=print) -> int:
     """0 purged (or nothing cited it), 1 NOT LIVE, 2 refused."""
     if os.environ.get("LT_RUN_ID"):
-        emit("purge: refused under a managed run (LT_RUN_ID is set); the owner runs purge by hand")
+        emit("purge: refused under a managed run (LT_RUN_ID is set); the user runs purge by hand")
         return 2
     if not source.strip():
         emit("purge: refused: give --source <path or id>")
         return 2
     try:
         root = Path(root) if root is not None else root_path()
+        idx = Path(index) if index is not None else index_path()
+        problem = index_location_problem(idx)
+        if problem:
+            raise KBError(problem)
     except KBError as e:
         emit(f"purge: refused: {e}")
         return 2
@@ -2236,7 +2245,6 @@ def purge(source: str, root=None, index=None, emit=print) -> int:
         manifest["pages"] = entries
         manifest["purged"] = today
         atomicio.write_text(root / MANIFEST, json.dumps(manifest, indent=1) + "\n")
-    idx = Path(index) if index is not None else index_path()
     rows_out = 0
     if idx.is_file():
         fd = os.open(str(idx.with_suffix(".lock")), os.O_RDWR | os.O_CREAT, 0o600)

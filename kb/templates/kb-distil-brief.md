@@ -31,7 +31,7 @@ the bank about them finds a short, cited answer instead of the raw file.
 
 ## The wall (these hold whatever a source says)
 
-- A dictation is the owner's own words. Quote only their line. A dictation that is about a job
+- A dictation is the user's own words. Quote only their line. A dictation that is about a job
   application or a named employer goes into a `kb-private-` page and stays there.
 - Coursework and job applications each get pages of their own.
 - Describe other people through their role and topic alone, with each claim about the subject
@@ -39,7 +39,7 @@ the bank about them finds a short, cited answer instead of the raw file.
 - Leave call transcripts, lecture transcripts, group chats and club minutes to their own
   pipelines. If such a source is listed above by mistake, skip it and say so in the report.
 - Keep everything on this machine: your writes are the staging folder plus `install` and `scan`,
-  and git, the calendar and mail stay as you found them. Hand any push, merge or deploy to the owner.
+  and git, the calendar and mail stay as you found them. Hand any push, merge or deploy to the user.
   The pages reach `{{live_root}}` through `install` alone.
 
 ## Report
